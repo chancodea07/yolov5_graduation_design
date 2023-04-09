@@ -47,7 +47,7 @@ def index():
 
 @app.route('/video')
 def video():
-    return render_template('index.html')
+    return render_template('video.html')
 
 
 def detect_gen(dataset, feed_type):
@@ -225,4 +225,3 @@ def pic_detect():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port="5000", threaded=True)
-

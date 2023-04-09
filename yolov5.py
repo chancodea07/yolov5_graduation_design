@@ -13,35 +13,42 @@ from utils.general import non_max_suppression, scale_boxes, check_imshow
 
 def draw_box_corner(draw_img, bbox, length, corner_color):
     # Top Left
-    cv2.line(draw_img, (bbox[0], bbox[1]), (bbox[0] +
-             length, bbox[1]), corner_color, thickness=3)
-    cv2.line(draw_img, (bbox[0], bbox[1]), (bbox[0],
-             bbox[1] + length), corner_color, thickness=3)
+    cv2.line(draw_img, (bbox[0], bbox[1]), (bbox[0] + length, bbox[1]),
+             corner_color,
+             thickness=3)
+    cv2.line(draw_img, (bbox[0], bbox[1]), (bbox[0], bbox[1] + length),
+             corner_color,
+             thickness=3)
     # Top Right
-    cv2.line(draw_img, (bbox[2], bbox[1]), (bbox[2] -
-             length, bbox[1]), corner_color, thickness=3)
-    cv2.line(draw_img, (bbox[2], bbox[1]), (bbox[2],
-             bbox[1] + length), corner_color, thickness=3)
+    cv2.line(draw_img, (bbox[2], bbox[1]), (bbox[2] - length, bbox[1]),
+             corner_color,
+             thickness=3)
+    cv2.line(draw_img, (bbox[2], bbox[1]), (bbox[2], bbox[1] + length),
+             corner_color,
+             thickness=3)
     # Bottom Left
-    cv2.line(draw_img, (bbox[0], bbox[3]), (bbox[0] +
-             length, bbox[3]), corner_color, thickness=3)
-    cv2.line(draw_img, (bbox[0], bbox[3]), (bbox[0],
-             bbox[3] - length), corner_color, thickness=3)
+    cv2.line(draw_img, (bbox[0], bbox[3]), (bbox[0] + length, bbox[3]),
+             corner_color,
+             thickness=3)
+    cv2.line(draw_img, (bbox[0], bbox[3]), (bbox[0], bbox[3] - length),
+             corner_color,
+             thickness=3)
     # Bottom Right
-    cv2.line(draw_img, (bbox[2], bbox[3]), (bbox[2] -
-             length, bbox[3]), corner_color, thickness=3)
-    cv2.line(draw_img, (bbox[2], bbox[3]), (bbox[2],
-             bbox[3] - length), corner_color, thickness=3)
+    cv2.line(draw_img, (bbox[2], bbox[3]), (bbox[2] - length, bbox[3]),
+             corner_color,
+             thickness=3)
+    cv2.line(draw_img, (bbox[2], bbox[3]), (bbox[2], bbox[3] - length),
+             corner_color,
+             thickness=3)
+
 
 class Darknet(object):
     """docstring for Darknet"""
-
     def __init__(self, opt):
         self.opt = opt
         self.device = select_device(self.opt["device"])
         self.half = self.device.type != 'cpu'  # half precision only supported on CUDA
-        self.model = attempt_load(
-            self.opt["weights"], device=self.device)
+        self.model = attempt_load(self.opt["weights"], device=self.device)
         self.stride = int(self.model.stride.max())
         self.model.to(self.device).eval()
         self.names = self.model.module.names if hasattr(
@@ -49,8 +56,9 @@ class Darknet(object):
         if self.half:
             self.model.half()
         self.source = self.opt["source"]
-        self.webcam = self.source.isnumeric() or self.source.endswith('.txt') or self.source.lower().startswith(
-            ('rtsp://', 'rtmp://', 'http://'))
+        self.webcam = self.source.isnumeric() or self.source.endswith(
+            '.txt') or self.source.lower().startswith(
+                ('rtsp://', 'rtmp://', 'http://'))
 
     def preprocess(self, img):
         img = np.ascontiguousarray(img)
@@ -69,8 +77,8 @@ class Darknet(object):
             t1 = time.time()
             pred = self.model(img, augment=self.opt["augment"])[0]  # 0.22s
             pred = pred.float()
-            pred = non_max_suppression(
-                pred, self.opt["conf_thres"], self.opt["iou_thres"])
+            pred = non_max_suppression(pred, self.opt["conf_thres"],
+                                       self.opt["iou_thres"])
             t2 = time.time()
 
             pred_boxes = []
@@ -85,8 +93,8 @@ class Darknet(object):
                 # normalization gain whwh
                 gn = torch.tensor(im0.shape)[[1, 0, 1, 0]]
                 if det is not None and len(det):
-                    det[:, :4] = scale_boxes(
-                        img.shape[2:], det[:, :4], im0.shape).round()
+                    det[:, :4] = scale_boxes(img.shape[2:], det[:, :4],
+                                             im0.shape).round()
 
                     # Print results
                     for c in det[:, -1].unique():
@@ -100,12 +108,14 @@ class Darknet(object):
                         score = round(conf.tolist(), 3)
                         label = "{}: {}".format(lbl, score)
                         # label : "class: possiblity",use slice to fix it
-                        x1, y1, x2, y2 = int(xyxy[0]), int(
-                            xyxy[1]), int(xyxy[2]), int(xyxy[3])
+                        x1, y1, x2, y2 = int(xyxy[0]), int(xyxy[1]), int(
+                            xyxy[2]), int(xyxy[3])
                         pred_boxes.append((x1, y1, x2, y2, lbl, score))
                         if view_img:
-                            self.plot_one_box(
-                                xyxy, im0, color=(255, 0, 0), label=label)
+                            self.plot_one_box(xyxy,
+                                              im0,
+                                              color=(255, 0, 0),
+                                              label=label)
 
                 # Print time (inference + NMS)
                 print(pred_boxes)
@@ -125,7 +135,12 @@ class Darknet(object):
         return pred_boxes
 
     # Plotting functions
-    def plot_one_box(self, x, img, color=None, label=None, line_thickness=None):
+    def plot_one_box(self,
+                     x,
+                     img,
+                     color=None,
+                     label=None,
+                     line_thickness=None):
         # Plots one bounding box on image img
         tl = line_thickness or round(
             0.001 * max(img.shape[0:2])) + 1  # line thickness
@@ -134,14 +149,18 @@ class Darknet(object):
         cv2.rectangle(img, c1, c2, color, thickness=tl)
         if label:
             tf = max(tl - 1, 1)  # font thickness
-            t_size = cv2.getTextSize(
-                label, 0, fontScale=tl / 3, thickness=tf)[0]
+            t_size = cv2.getTextSize(label, 0, fontScale=tl / 3,
+                                     thickness=tf)[0]
             c2 = c1[0] + t_size[0], c1[1] - t_size[1] - 3
             cv2.rectangle(img, c1, c2, color, -1)  # filled
             point = [int(x[0]), int(x[1]), int(x[2]), int(x[3])]
             draw_box_corner(img, point, 10, (0, 255, 128))
-            cv2.putText(img, label, (c1[0], c1[1] - 2), 0, tl / 3,
-                        [0, 0, 0], thickness=tf, lineType=cv2.LINE_AA)
+            cv2.putText(img,
+                        label, (c1[0], c1[1] - 2),
+                        0,
+                        tl / 3, [0, 0, 0],
+                        thickness=tf,
+                        lineType=cv2.LINE_AA)
 
 
 if __name__ == "__main__":
@@ -151,10 +170,12 @@ if __name__ == "__main__":
     darknet = Darknet(opt)
     if darknet.webcam:
         # cudnn.benchmark = True  # set True to speed up constant image size inference
-        dataset = LoadStreams(
-            darknet.source, img_size=opt["imgsz"], stride=darknet.stride)
+        dataset = LoadStreams(darknet.source,
+                              img_size=opt["imgsz"],
+                              stride=darknet.stride)
     else:
-        dataset = LoadImages(
-            darknet.source, img_size=opt["imgsz"], stride=darknet.stride)
+        dataset = LoadImages(darknet.source,
+                             img_size=opt["imgsz"],
+                             stride=darknet.stride)
     darknet.detect(dataset)
     cv2.destroyAllWindows()
