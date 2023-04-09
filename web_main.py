@@ -5,7 +5,7 @@ from yolov5 import Darknet
 from camera import LoadStreams, LoadImages
 from utils.general import non_max_suppression, scale_boxes, check_imshow
 from utils.dataloaders import letterbox
-from flask import Response, request, send_file
+from flask import Response, request, send_file, jsonify, make_response
 from flask import Flask
 from flask import render_template
 from flask_cors import CORS, cross_origin
@@ -220,7 +220,14 @@ def pic_detect():
             draw_box_corner(img_bgr, item, 10, (0, 255, 128))
         _, img_encoded = cv2.imencode('.jpg', img_bgr)
         img_bytes = io.BytesIO(img_encoded)  # 将二进制数据转换为BytesIO对象
-        return send_file(img_bytes, mimetype='image/jpeg')  # 返回BytesIO对象给客户端
+
+        response = make_response(send_file(img_bytes, mimetype='image/jpeg'))
+        # 置信度处理 返回自定义头用于前端取置信度
+        predinfo = []
+        for item in arr:
+            predinfo.append([item[-2],item[-1]])
+        response.headers['pred'] = predinfo
+        return response  # 返回BytesIO对象/自定义响应对象给客户端
 
 
 if __name__ == '__main__':

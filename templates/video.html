@@ -1,41 +1,54 @@
 <html>
-  <head>
+
+<head>
 	<style>
-	* {
-	  box-sizing: border-box;
-	  text-align: center;
-	}
+		.center {
+			height: 50%;
+			width: 55%;
+			border: 1px solid black;
+			margin: 0 auto;
+		}
 
-	.img-container {
-	  float: left;
-	  width: 50%;
-	  padding: 5px;
-	}
+		#main {
+			display: flex;
+		}
 
-	.clearfix::after {
-	  content: "";
-	  clear: both;
-	  display: table;
-	}
-	.clearfix{
-		margin-left: 500px;
-	}
+		#main_menu {
+			display: flex;
+			align-items: center;
+			flex-direction: column;
+			justify-content: space-around;
+		}
 	</style>
-  </head>
-  <body>
-  	<h1>CameraDetection with YOLOv5</h1>
-  	<div class="clearfix">
-  		<div class="img-container" align="center">
-        	<p align="center">视频流</p>
-        	<img src="{{ url_for('video_feed', feed_type='Camera_0') }}" class="center"  style="border:1px solid black;width:100%" alt="Live Stream 1">
-  		</div>
+</head>
+<link rel="stylesheet" href="{{url_for('static',filename='style.css')}}">
+
+<body>
+	<h1>目标检测-视频子菜单检测</h1>
+	<div id="main">
+		<div class="a">
+			<div align="center">
+				<p align="center">&nbsp;&nbsp;&nbsp;&nbsp;视频流-本地摄像头</p>
+				<img src="{{ url_for('video_feed', feed_type='Camera_0') }}" class="center" alt="Live Stream 1">
+			</div>
+		</div>
+		<div id="main_menu" class="a">
+			<div id="picmenu">
+				<button onclick="gobackpic()" class="btn">To 图片检测</button>
+			</div>
+			<div id="menu">
+				<button onclick="gobackMain()" class="btn">回到主菜单</button>
+			</div>
+		</div>
 	</div>
-	<button onclick="gobackMain()">回到主菜单</button>
-  </body>
-  <script>
-	function gobackMain(){
+</body>
+<script>
+	function gobackMain() {
 		window.location.href = '/'
 	}
-  </script>
-</html>
+	function gobackpic() {
+		window.location.href = '/pic'
+	}
+</script>
 
+</html>
