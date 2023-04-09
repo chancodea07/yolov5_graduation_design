@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>YOLOv5 Image Detection</title>
+	</head>
+	<!-- 引入 layui.css -->
+	<link rel="stylesheet" href="css/layui.css" />
+	<style>
+		#pic_process {
+			display: flex;
+			flex-direction: row;
+		}
+	</style>
+
+	<body>
+		<h1>YOLOv5 Image Detection</h1>
+		<form id="form">
+			<input type="file" id="imageInput" name="image" />
+			<br /><br />
+			<button type="submit" class="layui-btn layui-btn-normal">Detect</button>
+		</form>
+		<div id="pic_process">
+			<h1 style="margin: 10px">原图</h1>
+			<img
+				id="outputimg-original"
+				style="display: none; width: 300px; height: 300px"
+			/>
+			<h1 style="margin: 10px">标注后的图</h1>
+			<img
+				id="outputimg-yolo"
+				style="display: none; width: 300px; height: 300px"
+			/>
+		</div>
+		<canvas id="outputcanvas" style="display: none"></canvas>
+		<button onclick="gobackMain()" class="layui-btn">回到主菜单</button>
+		<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+		<!-- 引入 layui.js -->
+		<script src="layui.js"></script>
+		<script>
+			const form = document.querySelector("#form");
+			const imageInput = document.querySelector("#imageInput");
+			const outputimgOriginal = document.querySelector("#outputimg-original");
+			const outputimgYolo = document.querySelector("#outputimg-yolo");
+			const outputcanvas = document.querySelector("#outputcanvas");
+			
+			form.addEventListener("submit", (event) => {
+				event.preventDefault();
+				const formData = new FormData();
+				formData.append("image", imageInput.files[0]);
+				axios
+					.post("http://127.0.0.1:5000/pic_detection", formData, {
+						headers: {
+							"Content-Type": "multipart/form-data",
+						},
+						responseType: "arraybuffer",
+					})
+					.then((response) => {
+						const img = new Image();
+						img.onload = function () {
+							outputcanvas.width = img.width;
+							outputcanvas.height = img.height;
+							const ctx = outputcanvas.getContext("2d");
+							ctx.drawImage(img, 0, 0, img.width, img.height);
+						};
+						const base64Data = btoa(
+							new Uint8Array(response.data).reduce(
+								(data, byte) => data + String.fromCharCode(byte),
+								""
+							)
+						);
+						outputimgYolo.src = "data:image/png;base64," + base64Data;
+						outputimgYolo.style.display = "inline";
+						outputimgOriginal.src = URL.createObjectURL(imageInput.files[0]);
+						outputimgOriginal.style.display = "inline";
+						console.log("success");
+					})
+					.catch((error) => {
+						console.log(error);
+					});
+			});
+			function gobackMain() {
+				window.location.href = "/";
+			}
+		</script>
+	</body>
+</html>

@@ -1,0 +1,41 @@
+<html>
+  <head>
+	<style>
+	* {
+	  box-sizing: border-box;
+	  text-align: center;
+	}
+
+	.img-container {
+	  float: left;
+	  width: 50%;
+	  padding: 5px;
+	}
+
+	.clearfix::after {
+	  content: "";
+	  clear: both;
+	  display: table;
+	}
+	.clearfix{
+		margin-left: 500px;
+	}
+	</style>
+  </head>
+  <body>
+  	<h1>CameraDetection with YOLOv5</h1>
+  	<div class="clearfix">
+  		<div class="img-container" align="center">
+        	<p align="center">视频流</p>
+        	<img src="{{ url_for('video_feed', feed_type='Camera_0') }}" class="center"  style="border:1px solid black;width:100%" alt="Live Stream 1">
+  		</div>
+	</div>
+	<button onclick="gobackMain()">回到主菜单</button>
+  </body>
+  <script>
+	function gobackMain(){
+		window.location.href = '/'
+	}
+  </script>
+</html>
+
